@@ -1,0 +1,119 @@
+* {
+  box-sizing: border-box;
+}
+
+* {
+  font-weight: inherit;
+  font-family: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  border: 0 none;
+  outline: 0;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  justify-content: center;
+  background-image: url("./sky.JPG");
+  background-color: rgb(172, 201, 255);
+}
+
+body {
+  background-size: cover;
+  font-family: "Roboto", sans-serif;
+}
+
+p {
+  color: white;
+  font-size: 20px;
+  display: inline-block;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-header {
+  height: 120px;
+  padding-top: 50px;
+  color: white;
+}
+
+.App-title {
+  color: #fff;
+  font-size: 32px;
+  font-weight: 500;
+  text-align: center;
+  text-shadow: 3px 3px rgba(50, 50, 70, 0.5);
+}
+
+.date {
+  font-size: 20px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 300;
+  font-style: italic;
+  text-align: center;
+}
+
+.content {
+  margin-top: 50px;
+}
+
+.temp-button {
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin: 3px;
+  color: white;
+  font-size: 20px;
+  background-color: Transparent;
+  background-repeat: no-repeat;
+  border: none;
+  overflow: hidden;
+  outline: none;
+}
+
+.show {
+  display: inline;
+}
+
+.no-show {
+  display: none;
+}
+
+.icon {
+  height: 180px;
+  width: 180px;
+}
+
+.form {
+  width: 100%;
+  padding-top: 10px;
+  padding-bottom: 35px;
+  position: fixed;
+  bottom: 0;
+  text-align: center;
+  display: block;
+
+  appearance: none;
+  background: none;
+  border: none;
+  outline: none;
+
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #313131;
+  font-size: 20px;
+}
+
+.form__button {
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.form__textfield {
+  padding: 5px;
+  margin-top: 5px;
+  border-radius: 3px;
+}
