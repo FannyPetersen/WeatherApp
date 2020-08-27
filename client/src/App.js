@@ -19,16 +19,14 @@ class App extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-
     if (!this.state.value.match(/^[a-zA-Z\s]*$/)) {
       this.setState({
         ...this.state,
         value: "",
-        error: "error",
+        error: "invalid input",
       });
     } else {
       this.callAPICity(this.state.value);
-
       this.setState({
         ...this.state,
         value: "",
@@ -51,14 +49,12 @@ class App extends Component {
   async callAPICity(city) {
     const response = await fetch(`http://localhost:8080/search/${city}`);
     const cityData = await response.json();
-
     if (!cityData.name) {
       this.setState({
         ...this.state,
         value: "",
-        error: "error",
+        error: "invalid input",
       });
-
     } else {
       this.setState({
         ...this.state,
@@ -76,45 +72,58 @@ class App extends Component {
   }
 
   async callAPINearby(location) {
-    const response = await fetch("http://localhost:8080/nearby", location);
-    console.log("RESPONSE", response);
-
-    const cityData = await response.json();
-
-    this.setState({
-      ...this.state,
-      apiResponse: {
-        weather: cityData.current.weather[0].description,
-        farenheit: cityData.current.temp,
-        celsius: Math.floor(cityData.current.temp - 273.15),
-        wind: cityData.current.wind_speed,
-        city: cityData.timezone.replace(/^(.*[\\/])/, "").replace(/_/g, " "),
-        icon: `http://openweathermap.org/img/wn/${cityData.current.weather[0].icon}@2x.png`,
-      },
-    });
-    // .catch(err => err);
+    try {
+      const response = await fetch("http://localhost:8080/nearby", location);
+      if (response.status !== 200) {
+        throw new Error("Something went wrong!");
+      } else {
+        const cityData = await response.json();
+        this.setState({
+          ...this.state,
+          apiResponse: {
+            weather: cityData.current.weather[0].description,
+            farenheit: cityData.current.temp,
+            celsius: Math.floor(cityData.current.temp - 273.15),
+            wind: cityData.current.wind_speed,
+            city: cityData.timezone
+              .replace(/^(.*[\\/])/, "")
+              .replace(/_/g, " "),
+            icon: `http://openweathermap.org/img/wn/${cityData.current.weather[0].icon}@2x.png`,
+          },
+        });
+      }
+    } catch (err) {
+      this.setState({
+        ...this.state,
+        value: "",
+        error: "server error",
+      });
+      console.error(err);
+    }
   }
 
   getLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const long = position.coords.longitude;
-        const lat = position.coords.latitude;
-        const coordinates = { lat, long };
-        const location = {
-          method: "POST",
-          mode: "no-cors",
-          headers: {
-            "Content-Type": "application/json",
-            accept: "application/json",
-          },
-          body: JSON.stringify(coordinates),
-        };
-        return location;
-      });
-      /*   } else {
-      // some error handling
-      alert("NOPE"); */
+    try {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const long = position.coords.longitude;
+          const lat = position.coords.latitude;
+          const coordinates = { lat, long };
+          const location = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              accept: "application/json",
+            },
+            body: JSON.stringify(coordinates),
+          };
+          return location;
+        });
+      } else {
+        throw new Error("Geolocation not available");
+      }
+    } catch (err) {
+      console.error(err);
     }
   }
 
@@ -124,17 +133,19 @@ class App extends Component {
   }
 
   render() {
-    const showIfNoError = this.state.error ? "no-show" : "show";
-    const showIfError = this.state.error ? "show" : "no-show";
+    const noError = this.state.error ? "no-show" : "show";
+    const invalidInput =
+      this.state.error === "invalid input" ? "show" : "no-show";
+    const notFound = this.state.error === "server error" ? "show" : "no-show";
 
     return (
       <div className="App">
-        <header className={`App-header ${showIfNoError}`}>
+        <header className={`App-header ${noError}`}>
           <h1 className="App-title">{this.state.apiResponse.city}</h1>
           <h2 className="date">{this.dateToday()}</h2>
         </header>
 
-        <section className={`content ${showIfNoError}`}>
+        <section className={`content ${noError}`}>
           <p className="weather">We have {this.state.apiResponse.weather},</p>
           <Temp
             cels={this.state.cels}
@@ -152,8 +163,17 @@ class App extends Component {
             alt="pretty weather icon"
           ></img>
         </section>
-        <section className={`content--error ${showIfError}`}>
+
+        <section className={`content--input-error ${invalidInput}`}>
           <p>Please input a valid city</p>
+        </section>
+
+        <section className={`content--not-found ${notFound}`}>
+          <p>
+            Sorry, something went wrong with getting your local weather data!
+          </p>
+          <br></br>
+          <p>You can still input a city below.</p>
         </section>
 
         <Search

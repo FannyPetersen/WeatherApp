@@ -17,14 +17,16 @@ app.use((req, res, next) => {
 app.use("/static", express.static(path.join(__dirname, "public")));
 
 app.get('/search/:city',  (req, res) => {
-  
-  // validate req.params here
+
+  if (!req.params.city.match(/^[a-zA-Z\s]*$/)) {
+    throw new Error("Invalid input params");
+  }
 
   const urlCity = `https://api.openweathermap.org/data/2.5/weather?q=${req.params.city}&appid=${apiKey}`;
   fetch(urlCity)
   .then(res => res.json())
   .then(data=>res.send(data))
-  .catch(err => 'ERROR HANDLING') // <--------- HÄÄR
+  .catch(err => console.error(err)) 
 });
 
  app.post('/nearby', (req, res) => {
